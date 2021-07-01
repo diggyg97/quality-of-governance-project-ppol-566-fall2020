@@ -1,0 +1,307 @@
+---
+title: "4_GED_Data"
+author: "Digvijay Ghotane"
+date: "12/16/2020"
+output: html_document
+---
+
+
+```{r}
+require(tidyverse)
+require(grid)
+library(viridis)
+```
+
+```{r}
+ged = read_csv("data/ged201.csv") # Reading in GED Data
+```
+
+# Figure 1
+```{r}
+ged %>% 
+  filter(type_of_violence == 2) %>% 
+  select(year) %>%
+  group_by(year) %>% 
+  summarize(events = n()) %>%
+  ungroup() %>% 
+  ggplot(aes(year, events)) + 
+  geom_area(alpha = 0.2, fill = 'darkred') + 
+  geom_point(size = 2) +
+  geom_line(size = 0.5) +
+  scale_x_continuous(breaks=unique(ged$year)) + 
+  geom_text(family = "Times New Roman", aes(label=year), size=2.5, hjust = 0, vjust = -.75) +
+  labs(title="Events of Armed Conflicts by Non-State Actors", 
+       subtitle = "Number of armed conflicts around the world across years involving non-state actors (NSA)", 
+       y="Number of Armed Conflicts by NSA's",
+       x = "Year",
+       caption="Source: Uppsala Conflict Data Program") +
+  
+  theme(panel.background = element_rect(fill = "white", 
+                                        colour = "gray", 
+                                        size = 1),
+        panel.grid = element_blank(),
+        plot.background = element_rect(fill = "white", 
+                                       colour = "black", 
+                                       size = 2),
+        axis.title = element_text(color = 'black', 
+                                   size = 10, 
+                                   family = 'Times New Roman'),
+        
+        axis.text = element_text(color = 'black', 
+                                   size = 9, 
+                                   family = 'Times New Roman',
+                                   angle = 90),
+        plot.title = element_text(
+          family = 'Times New Roman', 
+                                  size = 15, color = 'black', 
+                                  face = 'bold',
+                                  hjust = 0.5),
+        plot.subtitle = element_text(
+          family = 'Times New Roman', 
+          size = 11, 
+                                     color = 'black', 
+                                     face = 'italic', 
+                                     hjust = 0.5),
+        plot.caption = element_text(family = 'Times New Roman', 
+                                    size = 9, 
+                                    color = 'black', 
+                                    face = 'italic', 
+                                    hjust = 1)) +
+  annotate("segment", x = 2012, xend = 2016.6, y = 2790, yend = 2790, colour = "darkred", size=0.4, alpha=0.6, arrow=arrow(angle = 20, type = 'closed')) +
+  annotate("text", x=2009,  y=2790, size=3, family = "Times New Roman", label = "Most conflicts in 2017!")  +
+  ## Saving as png image
+  ggsave(filename = "Figures/figure1.png",device = "png", width = 10, height = 5,
+         units = "in", dpi = 600)
+  
+```
+
+# Figure 4a
+```{r}
+ged %>% 
+  filter(type_of_violence == 2) %>% 
+  select(country, year, latitude, longitude) %>% 
+  group_by(country, year) %>% 
+  summarize(n = n()) %>% 
+  ggplot(aes(n)) +
+  geom_density(fill = 'darkred', alpha = 0.4) + 
+  labs(title="Events of Armed Conflicts by Non-State Actors", 
+       subtitle = "A frequency distribution denoting the total occurances of number of armed conflicts by country-year", 
+       y="Frequency",
+       x = "Number of Armed Conflicts by NSA's",
+       caption="Source: Uppsala Conflict Data Program") +
+  
+  theme(panel.background = element_rect(fill = "white", 
+                                        colour = "gray", 
+                                        size = 1),
+        panel.grid = element_blank(),
+        plot.background = element_rect(fill = "white", 
+                                       colour = "black", 
+                                       size = 2),
+        axis.title = element_text(color = 'black', 
+                                   size = 10, 
+                                   family = 'Times New Roman'),
+        
+        axis.text = element_text(color = 'black', 
+                                   size = 9, 
+                                   family = 'Times New Roman',
+                                   angle = 90),
+        plot.title = element_text(
+          family = 'Times New Roman', 
+                                  size = 15, color = 'black', 
+                                  face = 'bold',
+                                  hjust = 0.5),
+        plot.subtitle = element_text(
+          family = 'Times New Roman', 
+          size = 11, 
+                                     color = 'black', 
+                                     face = 'italic', 
+                                     hjust = 0.5),
+        plot.caption = element_text(family = 'Times New Roman', 
+                                    size = 9, 
+                                    color = 'black', 
+                                    face = 'italic', 
+                                    hjust = 1)) +
+  annotate("text", x=-100,  y=0.03, size=3, family = "Times New Roman", label = "Low Conflict", angle = 90)  +
+  annotate("text", x=100,  y=0.03, size=3, family = "Times New Roman", label = "Medium Conflict", angle = 90)  +
+  annotate("text", x=500,  y=0.03, size=3, family = "Times New Roman", label = "High Conflict", angle = 90)  +
+  geom_vline(xintercept = 10, color = 'darkred', size = 1) +
+  geom_vline(xintercept = 200, color = 'darkred', size = 1) +
+  annotate("segment", x = 300, xend = 200, y = 0.01, yend = 0, colour = "black", size=0.4, alpha=0.6, arrow=arrow(angle = 20, type = 'closed')) +
+  annotate("text", x=300,  y=0.012, size=3, family = "Times New Roman", label = "200")  +
+  annotate("segment", x = 110, xend = 10, y = 0.01, yend = 0, colour = "black", size=0.4, alpha=0.6, arrow=arrow(angle = 20, type = 'closed')) +
+  annotate("text", x=110,  y=0.012, size=3, family = "Times New Roman", label = "10")  +
+  ## Saving as png image
+  ggsave(filename = "Figures/figure4a.png",device = "png", width = 10, height = 5,
+         units = "in", dpi = 600)
+
+```
+# figure 4b
+```{r}
+require(scales)
+bins = ged %>% 
+  filter(type_of_violence == 2) %>% 
+  select(country, year, latitude, longitude) %>% 
+  group_by(country, year) %>% 
+  summarize(n = n()) %>% 
+  mutate(bin = "Unknown",
+         bin = ifelse(n <= 10, "Low Conflict", bin),
+         bin = ifelse(n >= 200, "High Conflict", bin),
+         bin = ifelse(10 < n & n < 200, "Medium Conflict", bin)) %>% 
+  group_by(bin) %>% 
+  summarize(count = n()) %>% 
+  mutate(fraction = count/sum(count),
+         ymax = cumsum(fraction))
+
+bins$ymin <- c(0, head(bins$ymax, n=-1))
+
+bins$labelPosition <- (bins$ymax + bins$ymin)/2
+
+bins$label <- paste0(bins$bin, ":\n", bins$count)
+ggplot(bins, aes(ymax=ymax, ymin=ymin, xmax=4, xmin=3, fill=bin)) +
+  geom_rect() +
+  geom_label( x=3.5, aes(y=labelPosition, label=label), size=6) +
+  scale_fill_viridis_d() +
+  coord_polar(theta="y") +
+  xlim(c(2, 4)) +
+  theme_void() +
+  theme(legend.position = "none") +
+  ## Saving as png image
+  ggsave(filename = "Figures/figure4b.png",device = "png", width = 5, height = 5,
+         units = "in", dpi = 600)
+```
+
+```{r}
+require(countrycode)
+ged = ged %>% 
+  filter(type_of_violence == 2) %>% 
+  select(country, year, latitude, longitude) %>% 
+  group_by(country, year) %>% 
+  summarize(n = n()) %>% 
+  mutate(bin = "Unknown",
+         bin = ifelse(n <= 10, "Low Conflict", bin),
+         bin = ifelse(n >= 200, "High Conflict", bin),
+         bin = ifelse(10 < n & n < 200, "Medium Conflict", bin)) %>% 
+  ungroup() %>% 
+  mutate(country = countrycode(country, origin = "country.name", destination = "country.name")) %>% 
+  mutate_all(~replace(., is.na(.), "Yugoslavia")) %>% 
+  mutate(year = as.numeric(year))
+```
+
+```{r}
+clust = read_csv("data/final_cluster_analysis.csv") %>% 
+  select(-X1) %>% 
+  mutate(country = countrycode(cname, origin = "country.name", destination = "country.name"))
+```
+# figure 8, 9
+```{r}
+clust %>% 
+  mutate(country = countrycode(cname, origin = "country.name", destination = "country.name")) %>% 
+  left_join(., ged, by = c("country", "year")) %>% 
+  filter(year > 1988) %>% 
+  select(-cname) %>% 
+  ggplot(aes(x=country, y=year, color = factor(cluster_4), shape = factor(bin))) +
+  geom_point() +
+  scale_fill_viridis(discrete=TRUE) +
+  labs(title="Country-Year Plot by 4 Clusters", 
+       color = "Cluster",
+       subtitle = "Comparison of Clusters by Country-Year", 
+       y="Years",
+       x = "Countries",
+       caption="Source: Quality of Governance & Uppsala Conflict Data Program") +
+  
+  theme(panel.background = element_rect(fill = "white", 
+                                        colour = "gray", 
+                                        size = 1),
+        panel.grid = element_blank(),
+        plot.background = element_rect(fill = "white", 
+                                       colour = "black", 
+                                       size = 2),
+        axis.title = element_text(color = 'black', 
+                                   size = 10, 
+                                   family = 'Times New Roman'),
+        axis.text.x = element_blank(),
+        
+        axis.text = element_text(color = 'black', 
+                                   size = 9, 
+                                   family = 'Times New Roman',
+                                   angle = 90),
+        plot.title = element_text(
+          family = 'Times New Roman', 
+                                  size = 15, color = 'black', 
+                                  face = 'bold',
+                                  hjust = 0.5),
+        plot.subtitle = element_text(
+          family = 'Times New Roman', 
+          size = 11, 
+                                     color = 'black', 
+                                     face = 'italic', 
+                                     hjust = 0.5),
+        plot.caption = element_text(family = 'Times New Roman', 
+                                    size = 9, 
+                                    color = 'black', 
+                                    face = 'italic', 
+                                    hjust = 1),
+        legend.title= element_text(family = 'Times New Roman', 
+                                    size = 12, 
+                                    color = 'black',
+                                    hjust = 1),
+        legend.text = element_text(family = 'Times New Roman', 
+                                    size = 9, 
+                                    color = 'black',
+                                    hjust = 1)) +
+  ## Saving as png image
+  ggsave(filename = "Figures/figure9.png",device = "png", width = 10, height = 5,
+         units = "in", dpi = 600)
+  
+```
+
+```{r}
+clust %>% 
+  mutate(country = countrycode(cname, origin = "country.name", destination = "country.name")) %>% 
+  left_join(., ged, by = c("country", "year")) %>% 
+  filter(year > 1988) %>% 
+  select(-cname) %>% 
+  filter(cluster_2 == 0)
+```
+```{r}
+library(tidyverse)
+library(rvest)
+library(magrittr)
+library(ggmap)
+library(stringr)
+```
+
+```{r}
+
+map.world <- map_data("world") %>% 
+  mutate(country = countrycode(region, origin = "country.name", destination = "country.name"))
+```
+```{r}
+map.world = map.world %>% left_join(., clust %>% 
+  mutate(country = countrycode(cname, origin = "country.name", destination = "country.name")) %>% 
+  left_join(., ged, by = c("country", "year")) %>%
+  select(-cname), by = "country")
+```
+
+```{r}
+map.world_2017 = map.world %>% filter(year == 2017)
+ggplot() +
+  geom_polygon(data = map.world_2017, aes(x = long, y = lat, group = group, fill = factor(cluster_2))) +
+  #geom_point(data = df.country_points, aes(x = lon, y = lat), color = "#e60000") +
+  scale_fill_viridis_d() +
+  labs(title = '2 Clusters - 2017'
+       ,subtitle = "Source: Quality of Governance") +
+  theme(text = element_text(family = "Times New Roman", color = "#FFFFFF")
+        ,panel.background = element_rect(fill = "#444444")
+        ,plot.background = element_rect(fill = "#444444")
+        ,panel.grid = element_blank()
+        ,plot.title = element_text(size = 30)
+        ,plot.subtitle = element_text(size = 10)
+        ,axis.text = element_blank()
+        ,axis.title = element_blank()
+        ,axis.ticks = element_blank()) +
+  ## Saving as png image
+  ggsave(filename = "Figures/figure9a.png",device = "png", width = 10, height = 5,
+         units = "in", dpi = 600)
+```
+

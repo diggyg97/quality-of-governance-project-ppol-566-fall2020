@@ -1,0 +1,39 @@
+---
+title: "3_VIF_calc"
+author: "Digvijay Ghotane"
+date: "12/16/2020"
+output: html_document
+---
+This file calculates the VIF for each variable. Please note that this is computationally VERY VERY expensive (may take a very very long time to run). I could not run this myself since each regression takes over a minute to run which would total to about 30+ hours given the number of variables and regressions that will occur with the variables.
+
+#Libraries
+```{r}
+require(tidyverse)
+#require(devtools)
+#devtools::install_github("marchtaylor/sinkr")
+require(sinkr)
+```
+
+# Calculating VIF for each variable.
+```{r}
+data = read_csv("data/imputed_data.csv")
+```
+
+```{r}
+vif_values = c()
+
+variables = names(data)
+
+fit <- lapply(data[,names(data)], function(x) lm(x ~ ., data = data))
+
+for(item in fit){
+  rsq = summary(item)$r.squared
+  vif = 1/(1-rsq)
+  vif_values.append(vif)
+}
+
+```
+
+```{r}
+vif_df = data.frame(variables, vif_values)
+```

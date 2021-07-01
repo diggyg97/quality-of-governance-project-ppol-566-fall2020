@@ -1,0 +1,37 @@
+---
+title: "2_DINEOF_IN_R"
+author: "Digvijay Ghotane"
+date: "11/9/2020"
+output: html_document
+---
+This file imputes missing data for each variable. Please note that this is computationally VERY expensive (may take a very long time to run). It took me about 3-4 hours to run this chunk of code. Please return to the Jupyter notebook after you run this.
+
+#Libraries
+```{r}
+require(tidyverse)
+#require(devtools)
+#devtools::install_github("marchtaylor/sinkr")
+require(sinkr)
+```
+
+# Reading the QoG3 csv file that was exported from the .ipynb file - 1_analysis.ipynb
+```{r}
+data = read_csv('data/qog3_apply_dineof.csv') %>% select(-X1)
+```
+
+# Applying DINEOF algorithm to the dataframe by first converting it into a matrix
+```{r}
+data_dineof = dineof(unname(as.matrix(data)))
+```
+
+```{r}
+cols = names(data) # Getting column names to reassign to new imputed matrix
+new_data_frame_imputed = as.data.frame(data_dineof$Xa) # Storing new imputed matrix as df
+names(new_data_frame_imputed) = cols # Assigning column names
+```
+
+# Writing back to csv to load into the .ipynb file - 1_analysis.ipynb
+```{r}
+new_data_frame_imputed %>% write_csv("data/imputed_data.csv")
+```
+
